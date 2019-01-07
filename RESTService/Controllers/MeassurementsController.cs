@@ -17,7 +17,7 @@ namespace RESTService.Controllers
 
         // GET: api/Meassurements
         [HttpGet]
-        public List<Meassurement> Get()
+        public List<Meassurement> GetAll()
         {
             List<Meassurement> objList = new List<Meassurement>();
 
@@ -54,8 +54,8 @@ namespace RESTService.Controllers
         }
 
         // GET: api/Meassurements/5
-        [HttpGet("{id}", Name = "Get")]
-        public Meassurement Get(int id)
+        [HttpGet("{id}")]
+        public Meassurement GetOne(int id)
         {
             Meassurement tempObj = null;
 
@@ -88,7 +88,7 @@ namespace RESTService.Controllers
 
         // POST: api/Meassurements
         [HttpPost]
-        public void Post([FromBody] Meassurement obj)
+        public void PostOne([FromBody] Meassurement obj)
         {
             using (SqlConnection con = new SqlConnection(conString))
             {
@@ -107,35 +107,28 @@ namespace RESTService.Controllers
             }
         }
 
-        // PUT: api/Meassurements
+        // PUT: api/Meassurements/5
         [HttpPut("{id}")]
-        public void Put([FromBody] Meassurement obj, int id)
+        public void PutOne([FromBody] Meassurement obj, int id)
         {
             using (SqlConnection con = new SqlConnection(conString))
             {
+                SqlCommand command = new SqlCommand("UPDATE Meassurement SET Pressure = @Pressure, Humidity = @Humidity, Temperature = @Temperature WHERE Id = @Id", con);
+
+                command.Parameters.AddWithValue("@Pressure", obj.Pressure);
+                command.Parameters.AddWithValue("@Humidity", obj.Humidity);
+                command.Parameters.AddWithValue("@Temperature", obj.Temperature);
+                command.Parameters.AddWithValue("@Id", id);
+
                 con.Open();
-
-                using (SqlCommand command = new SqlCommand("UPDATE Meassurement" +
-                                                           "SET" +
-                                                           "Pressure = '@Pressure'," +
-                                                           "Humidity = '@Humidity'," +
-                                                           "Temperature = '@Temperature'" +
-                                                           "WHERE Id = $Id", con))
-                {
-                    command.Parameters.AddWithValue("@Id", id);
-                    command.Parameters.AddWithValue("@Pressure", obj.Pressure);
-                    command.Parameters.AddWithValue("@Humidity", obj.Humidity);
-                    command.Parameters.AddWithValue("@Temperature", obj.Temperature);
-                    command.ExecuteNonQuery();
-                }
-
+                command.ExecuteNonQuery();
                 con.Close();
             }
         }
 
         // DELETE: api/Measssurements/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public void DeleteOne(int id)
         {
             using (SqlConnection con = new SqlConnection(conString))
             {
